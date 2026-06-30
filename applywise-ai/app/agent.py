@@ -16,12 +16,13 @@
 import os
 import google.auth
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List, Union
 
 from google.adk.workflow import Workflow, node, START
 from google.adk.agents import Agent
 from google.adk.apps import App
 from google.adk.events.event import Event
+from google.adk.agents.context import Context
 from google.adk.models import Gemini
 from google.genai import types
 
@@ -42,7 +43,7 @@ class AssistantInput(BaseModel):
         description="The job description or posting details."
     )
 
-# Define output schemas for the agents to ensure structured and reliable data flow
+# Define output schemas for intermediate agents to ensure structured data flow
 class JobAnalysisOutput(BaseModel):
     analysis: str = Field(description="The detailed job analysis report in markdown.")
 
@@ -55,8 +56,19 @@ class ResumeTailoringOutput(BaseModel):
 class InterviewPrepOutput(BaseModel):
     prep_guide: str = Field(description="The interview preparation questions, tips, and guidelines in markdown.")
 
+# The final consolidated application package schema requested by the user
 class FinalPackageOutput(BaseModel):
-    complete_package: str = Field(description="The consolidated, bilingual Canadian Tech Application Package in markdown.")
+    job_summary: str = Field(description="A concise summary of the job role and company.")
+    match_score: int = Field(description="A candidate fit score out of 100 based on the fit analysis.")
+    top_matching_skills: List[str] = Field(description="List of the candidate's skills that match the job requirements.")
+    missing_skills: List[str] = Field(description="List of key skills or requirements the candidate is missing.")
+    resume_headline: str = Field(description="A professional, tailored resume headline.")
+    professional_summary: str = Field(description="A tailored professional summary (bilingual: English & French).")
+    resume_bullet_points: List[str] = Field(description="3-5 tailored achievement-oriented bullet points for the resume (bilingual: English & French).")
+    cover_letter_draft: str = Field(description="A drafted cover letter tailored to the job posting (bilingual: English & French).")
+    interview_questions: List[str] = Field(description="3-4 likely interview questions and preparation tips.")
+    bilingual_pitch: str = Field(description="A 30-second elevator pitch in both English and French.")
+    application_checklist: List[str] = Field(description="A checklist of next steps for the candidate.")
 
 # 1. Input Checker Node
 @node
@@ -68,14 +80,9 @@ def check_inputs(node_input: AssistantInput) -> Event:
     if not profile or not job or len(profile.strip()) < 15 or len(job.strip()) < 15:
         return Event(output=node_input, route="missing")
     
-    # Store inputs in the session state so subsequent agents can access them
     return Event(
         output=node_input,
-        route="valid",
-        state={
-            "candidate_profile": profile,
-            "job_posting": job
-        }
+        route="valid"
     )
 
 # 2. Job Analyzer Agent
@@ -162,28 +169,71 @@ interview_coach = Agent(
     output_key="interview_prep"
 )
 
-# 6. Root Orchestrator Agent
-root_orchestrator = Agent(
-    name="root_orchestrator",
+# 6. Compiler Agent
+compiler_agent = Agent(
+    name="compiler_agent",
     model=Gemini(
         model="gemini-2.5-flash",
         retry_options=types.HttpRetryOptions(attempts=3),
     ),
     instruction="""
-    You are the Lead Career Coach and Orchestrator.
-    Compile and synthesize the outputs from all previous stages:
+    You are the Lead Career Coach and Compiler.
+    You will receive:
     - Job Analysis: {job_analysis}
     - Candidate Fit: {candidate_fit}
-    - Tailored Resume Recommendations: {tailored_resume}
-    - Interview Prep Guide: {interview_prep}
+    - Tailored Resume: {tailored_resume}
+    - Interview Prep: {interview_prep}
+    - Candidate Profile: {candidate_profile}
+    - Job Posting: {job_posting}
     
-    Generate a complete, professionally formatted "Canadian Tech Application Package".
-    The package must be highly encouraging, structured with clear markdown headings, and include bilingual (English and French) sections where appropriate or a bilingual summary.
+    Compile these into a structured, bilingual (English/French) Canadian Tech Application Package.
+    
+    You must populate all 11 fields in the output schema:
+    1. job_summary: A concise summary of the job role and company.
+    2. match_score: A candidate fit score out of 100 based on the fit analysis.
+    3. top_matching_skills: List of the candidate's skills that match the job requirements.
+    4. missing_skills: List of key skills or requirements the candidate is missing.
+    5. resume_headline: A professional, tailored resume headline.
+    6. professional_summary: A tailored professional summary (bilingual: English & French).
+    7. resume_bullet_points: 3-5 tailored achievement-oriented bullet points for the resume (bilingual: English & French).
+    8. cover_letter_draft: A drafted cover letter tailored to the job posting (bilingual: English & French).
+    9. interview_questions: 3-4 likely interview questions and preparation tips.
+    10. bilingual_pitch: A 30-second elevator pitch in both English and French.
+    11. application_checklist: A checklist of next steps for the candidate.
     """,
-    output_schema=FinalPackageOutput
+    output_schema=FinalPackageOutput,
+    output_key="final_package"
 )
 
-# 7. Fallback Node for Missing/Unrelated Inputs
+# 7. Dynamic Orchestrator Node
+@node(rerun_on_resume=True)
+async def root_orchestrator(ctx: Context, node_input: AssistantInput) -> FinalPackageOutput:
+    # Set the candidate profile and job posting in the state so all sub-agents can access them
+    ctx.state["candidate_profile"] = node_input.candidate_profile
+    ctx.state["job_posting"] = node_input.job_posting
+
+    # 1. Run Job Analyzer Agent
+    job_analysis = await ctx.run_node(job_analyzer, node_input=node_input.job_posting)
+    ctx.state["job_analysis"] = job_analysis.get("analysis", "")
+
+    # 2. Run Candidate Fit Agent
+    candidate_fit = await ctx.run_node(candidate_fit_agent, node_input=node_input.candidate_profile)
+    ctx.state["candidate_fit"] = candidate_fit.get("fit_assessment", "")
+
+    # 3. Run Resume Tailor Agent
+    resume_tailored = await ctx.run_node(resume_tailor, node_input=node_input.candidate_profile)
+    ctx.state["tailored_resume"] = resume_tailored.get("tailored_resume", "")
+
+    # 4. Run Interview Coach Agent
+    interview_prep = await ctx.run_node(interview_coach, node_input=node_input.candidate_profile)
+    ctx.state["interview_prep"] = interview_prep.get("prep_guide", "")
+
+    # 5. Run Compiler Agent to produce the final structured application package
+    final_package = await ctx.run_node(compiler_agent, node_input="Please compile the application package.")
+    
+    return final_package
+
+# 8. Fallback Node for Missing/Unrelated Inputs
 @node
 def ask_for_inputs(node_input: AssistantInput) -> Event:
     msg = (
@@ -198,14 +248,13 @@ def ask_for_inputs(node_input: AssistantInput) -> Event:
         output=msg
     )
 
-# Define the graph workflow edges using the correct tuple-based RoutingMap syntax
+# Define the graph workflow edges
 edges = [
     (START, check_inputs),
     (check_inputs, {
-        "valid": job_analyzer,
+        "valid": root_orchestrator,
         "missing": ask_for_inputs
-    }),
-    (job_analyzer, candidate_fit_agent, resume_tailor, interview_coach, root_orchestrator)
+    })
 ]
 
 # Define the root workflow agent
@@ -213,6 +262,7 @@ root_agent = Workflow(
     name="applywise_ai",
     edges=edges,
     input_schema=AssistantInput,
+    output_schema=Union[FinalPackageOutput, str],
     description="Bilingual career application assistant for Canadian tech job seekers."
 )
 

@@ -1,5 +1,6 @@
 import asyncio
 import sys
+import json
 from google.adk.apps import App
 from google.adk.runners import InMemoryRunner
 from google.genai import types
@@ -42,7 +43,6 @@ async def main():
     - Passion for AI and building next-gen developer tools.
     """
     
-    import json
     input_data = json.dumps({
         "candidate_profile": candidate_profile,
         "job_posting": job_posting
@@ -57,13 +57,19 @@ async def main():
             parts=[types.Part.from_text(text=input_data)]
         ),
     ):
-        # Print intermediate outputs and content as they arrive
+        # Print intermediate content (from sub-agents) if any is emitted to the UI
         if event.content is not None:
             for part in event.content.parts:
                 if part.text:
                     print(part.text, end="", flush=True)
+                    
+        # When we get the final output, print it as a pretty JSON
         if event.output is not None:
-            print(f"\n\n[Final Output Object]:\n{event.output}")
+            print("\n\n=== FINAL APPLICATION PACKAGE (11 SECTIONS) ===")
+            if hasattr(event.output, "model_dump"):
+                print(json.dumps(event.output.model_dump(), indent=2, ensure_ascii=False))
+            else:
+                print(event.output)
 
 if __name__ == "__main__":
     asyncio.run(main())
