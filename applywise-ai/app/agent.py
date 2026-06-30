@@ -1,4 +1,3 @@
-# ruff: noqa
 # Copyright 2026 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,17 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import google.auth
+"""ADK entry point — kept minimal.
+
+All agent logic lives in the ``applywise_ai`` package.
+This file exists because the ADK CLI expects ``app/agent.py``.
+"""
+
 from google.adk.apps import App
 
-# Set up Google Cloud project environment variables
-_, project_id = google.auth.default()
-os.environ["GOOGLE_CLOUD_PROJECT"] = project_id
-os.environ["GOOGLE_CLOUD_LOCATION"] = "global"
-os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "True"
-
-# Import the root workflow agent from the refactored package
+import applywise_ai.config  # noqa: F401  — triggers GCP env init
 from applywise_ai.workflow.graph import root_agent
 
 # Initialize the App container

@@ -28,14 +28,14 @@ candidate_fit_agent = Agent(
     instruction="""
     You are a Career Consultant specializing in the Canadian tech sector.
     Compare the candidate's profile: {candidate_profile} against the Job Analysis: {job_analysis}
-    
+
     Provide a detailed assessment:
     1. Key Strengths: Where does the candidate strongly align with the job requirements?
     2. Gap Analysis: What critical technical or soft skills is the candidate missing or lacking depth in?
     3. Actionable Recommendations: How can the candidate address these gaps in their application or interview?
-    
+
     Provide the feedback in a constructive, bilingual-friendly tone.
     """,
     output_schema=CandidateFitOutput,
-    output_key="candidate_fit"
+    output_key="candidate_fit",
 )

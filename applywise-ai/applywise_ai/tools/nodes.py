@@ -12,25 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from google.adk.workflow import node
 from google.adk.events.event import Event
+from google.adk.workflow import node
 from google.genai import types
 
 from .schemas import AssistantInput
+
 
 @node
 def check_inputs(node_input: AssistantInput) -> Event:
     """Verifies that both candidate profile and job posting are provided with sufficient length."""
     profile = node_input.candidate_profile
     job = node_input.job_posting
-    
+
     if not profile or not job or len(profile.strip()) < 15 or len(job.strip()) < 15:
-        return Event(output=node_input, route="missing")
-    
-    return Event(
-        output=node_input,
-        route="valid"
-    )
+        return Event(output=node_input, actions={"route": "missing"})
+
+    return Event(output=node_input, actions={"route": "valid"})
+
 
 @node
 def ask_for_inputs(node_input: AssistantInput) -> Event:
@@ -44,5 +43,5 @@ def ask_for_inputs(node_input: AssistantInput) -> Event:
     )
     return Event(
         content=types.Content(role="model", parts=[types.Part.from_text(text=msg)]),
-        output=msg
+        output=msg,
     )

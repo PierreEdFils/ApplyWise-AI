@@ -28,7 +28,7 @@ job_analyzer = Agent(
     instruction="""
     You are an expert Canadian Tech Recruiter and Job Analyst.
     Analyze the provided job posting: {job_posting}
-    
+
     You must extract and populate all 11 fields in the output schema:
     1. job_title: The title of the job.
     2. company_name: The name of the hiring company.
@@ -41,9 +41,9 @@ job_analyzer = Agent(
     9. important_keywords: List of important keywords from the posting.
     10. tools_and_technologies: List of tools, software, or technologies mentioned.
     11. language_requirements: Language requirements (e.g., English, French, Bilingual).
-    
+
     Ensure that the extraction is precise and highly structured.
     """,
     output_schema=JobAnalysisOutput,
-    output_key="job_analysis"
+    output_key="job_analysis",
 )

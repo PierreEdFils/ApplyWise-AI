@@ -12,20 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from google.adk.workflow import Workflow, START
-from typing import Union
+from google.adk.workflow import START, Workflow
 
-from ..tools.schemas import AssistantInput, FinalPackageOutput
-from ..tools.nodes import check_inputs, ask_for_inputs
 from ..agents.root_agent import root_orchestrator
+from ..tools.nodes import ask_for_inputs, check_inputs
+from ..tools.schemas import AssistantInput, FinalPackageOutput
 
 # Define the graph workflow edges
 edges = [
     (START, check_inputs),
-    (check_inputs, {
-        "valid": root_orchestrator,
-        "missing": ask_for_inputs
-    })
+    (check_inputs, {"valid": root_orchestrator, "missing": ask_for_inputs}),
 ]
 
 # Define the root workflow agent
@@ -33,6 +29,6 @@ root_agent = Workflow(
     name="applywise_ai",
     edges=edges,
     input_schema=AssistantInput,
-    output_schema=Union[FinalPackageOutput, str],
-    description="Bilingual career application assistant for Canadian tech job seekers."
+    output_schema=FinalPackageOutput | str,
+    description="Bilingual career application assistant for Canadian tech job seekers.",
 )

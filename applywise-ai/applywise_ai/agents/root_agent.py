@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from google.adk.workflow import node
 from google.adk.agents import Agent
 from google.adk.agents.context import Context
 from google.adk.models import Gemini
+from google.adk.workflow import node
 from google.genai import types
 
 from ..tools.schemas import AssistantInput, FinalPackageOutput
-from .job_analyzer_agent import job_analyzer
 from .candidate_fit_agent import candidate_fit_agent
-from .resume_tailor_agent import resume_tailor
 from .interview_coach_agent import interview_coach
+from .job_analyzer_agent import job_analyzer
+from .resume_tailor_agent import resume_tailor
 
 # Compiler Agent responsible for consolidating and formatting the final 11-field output package
 compiler_agent = Agent(
@@ -40,9 +40,9 @@ compiler_agent = Agent(
     - Interview Prep: {interview_prep}
     - Candidate Profile: {candidate_profile}
     - Job Posting: {job_posting}
-    
+
     Compile these into a structured, bilingual (English/French) Canadian Tech Application Package.
-    
+
     You must populate all 11 fields in the output schema:
     1. job_summary: A concise summary of the job role and company.
     2. match_score: A candidate fit score out of 100 based on the fit analysis.
@@ -57,13 +57,16 @@ compiler_agent = Agent(
     11. application_checklist: A checklist of next steps for the candidate.
     """,
     output_schema=FinalPackageOutput,
-    output_key="final_package"
+    output_key="final_package",
 )
 
+
 @node(rerun_on_resume=True)
-async def root_orchestrator(ctx: Context, node_input: AssistantInput) -> FinalPackageOutput:
+async def root_orchestrator(
+    ctx: Context, node_input: AssistantInput
+) -> FinalPackageOutput:
     """The Root Orchestrator Agent that controls the full multi-agent workflow.
-    
+
     It receives the candidate profile and job posting, updates the state,
     and programmatically routes to each sub-agent before compiling the results.
     """
@@ -76,18 +79,26 @@ async def root_orchestrator(ctx: Context, node_input: AssistantInput) -> FinalPa
     ctx.state["job_analysis"] = job_analysis
 
     # 2. Run Candidate Fit Agent
-    candidate_fit = await ctx.run_node(candidate_fit_agent, node_input=node_input.candidate_profile)
+    candidate_fit = await ctx.run_node(
+        candidate_fit_agent, node_input=node_input.candidate_profile
+    )
     ctx.state["candidate_fit"] = candidate_fit.get("fit_assessment", "")
 
     # 3. Run Resume Tailor Agent
-    resume_tailored = await ctx.run_node(resume_tailor, node_input=node_input.candidate_profile)
+    resume_tailored = await ctx.run_node(
+        resume_tailor, node_input=node_input.candidate_profile
+    )
     ctx.state["tailored_resume"] = resume_tailored.get("tailored_resume", "")
 
     # 4. Run Interview Coach Agent
-    interview_prep = await ctx.run_node(interview_coach, node_input=node_input.candidate_profile)
+    interview_prep = await ctx.run_node(
+        interview_coach, node_input=node_input.candidate_profile
+    )
     ctx.state["interview_prep"] = interview_prep.get("prep_guide", "")
 
     # 5. Run Compiler Agent to produce the final structured application package
-    final_package = await ctx.run_node(compiler_agent, node_input="Please compile the application package.")
-    
+    final_package = await ctx.run_node(
+        compiler_agent, node_input="Please compile the application package."
+    )
+
     return final_package

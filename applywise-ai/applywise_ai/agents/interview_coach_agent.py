@@ -28,11 +28,11 @@ interview_coach = Agent(
     instruction="""
     You are a Tech Interview Coach.
     Based on the Job Analysis: {job_analysis} and the Candidate's Profile: {candidate_profile}, generate:
-    
+
     1. 3-4 likely technical or behavioral interview questions (using the STAR method) specific to this role.
     2. Clear guidance on how the candidate should answer them using their background.
     3. A brief bilingual (English/French) tip sheet for interviewing in the Canadian tech landscape (cultural expectations, discussing work authorization, bilingual communication).
     """,
     output_schema=InterviewPrepOutput,
-    output_key="interview_prep"
+    output_key="interview_prep",
 )

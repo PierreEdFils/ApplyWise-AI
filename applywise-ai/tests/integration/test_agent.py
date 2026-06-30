@@ -17,7 +17,8 @@ from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
 
-from app.agent import root_agent
+import applywise_ai.config  # noqa: F401
+from applywise_ai.workflow.graph import root_agent
 
 
 def test_agent_stream() -> None:

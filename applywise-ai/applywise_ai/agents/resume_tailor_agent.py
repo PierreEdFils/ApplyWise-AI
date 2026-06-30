@@ -28,13 +28,13 @@ resume_tailor = Agent(
     instruction="""
     You are an expert Resume Writer for the Canadian tech market.
     Using the candidate's profile: {candidate_profile}, the Job Analysis: {job_analysis}, and the Fit Assessment: {candidate_fit}, generate:
-    
+
     1. A tailored professional summary (approx. 3-4 sentences) highlighting their fit.
     2. 3-5 tailored achievement-oriented bullet points for their most recent experience following Canadian resume best practices (action verbs, quantifiable impact, no photos or personal info).
     3. Recommendations for adjusting their skills section.
-    
+
     If the job requires bilingualism or is located in a bilingual region (e.g., Ottawa, Montreal), provide tailored content in both English and French.
     """,
     output_schema=ResumeTailoringOutput,
-    output_key="tailored_resume"
+    output_key="tailored_resume",
 )

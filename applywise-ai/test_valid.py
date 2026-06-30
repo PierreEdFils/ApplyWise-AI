@@ -1,17 +1,19 @@
 import asyncio
-import sys
 import json
+import sys
+
 from google.adk.apps import App
 from google.adk.runners import InMemoryRunner
 from google.genai import types
 
 # Force UTF-8 encoding on stdout for Windows console compatibility
 if sys.platform == "win32":
-    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stdout.reconfigure(encoding="utf-8")
 
-# Add the app directory to path
-sys.path.append(".")
-from app.agent import root_agent
+# Initialize GCP environment and import the workflow root agent
+import applywise_ai.config  # noqa: F401
+from applywise_ai.workflow.graph import root_agent
+
 
 async def main():
     app = App(name="app", root_agent=root_agent)
@@ -19,7 +21,7 @@ async def main():
     session = await runner.session_service.create_session(
         app_name="app", user_id="test_user"
     )
-    
+
     candidate_profile = """
     Pierre Ed Fils
     Senior Fullstack Software Engineer
@@ -30,7 +32,7 @@ async def main():
     - Designed and implemented microservices on GKE and Cloud Run.
     - Led a team of 3 developers to migrate a legacy system, improving performance by 40%.
     """
-    
+
     job_posting = """
     Senior Fullstack Developer (Bilingual English/French)
     Company: ApplyWise AI
@@ -42,34 +44,35 @@ async def main():
     - Excellent communication skills; bilingualism (English/French) is highly preferred for collaborating with teams in Quebec and Ontario.
     - Passion for AI and building next-gen developer tools.
     """
-    
-    input_data = json.dumps({
-        "candidate_profile": candidate_profile,
-        "job_posting": job_posting
-    })
-    
+
+    input_data = json.dumps(
+        {"candidate_profile": candidate_profile, "job_posting": job_posting}
+    )
+
     print("--- Running Workflow with Valid Inputs ---")
     async for event in runner.run_async(
         user_id="test_user",
         session_id=session.id,
         new_message=types.Content(
-            role="user", 
-            parts=[types.Part.from_text(text=input_data)]
+            role="user", parts=[types.Part.from_text(text=input_data)]
         ),
     ):
         # Print intermediate content (from sub-agents) if any is emitted to the UI
-        if event.content is not None:
+        if event.content is not None and event.content.parts is not None:
             for part in event.content.parts:
                 if part.text:
                     print(part.text, end="", flush=True)
-                    
+
         # When we get the final output, print it as a pretty JSON
         if event.output is not None:
             print("\n\n=== FINAL APPLICATION PACKAGE (11 SECTIONS) ===")
             if hasattr(event.output, "model_dump"):
-                print(json.dumps(event.output.model_dump(), indent=2, ensure_ascii=False))
+                print(
+                    json.dumps(event.output.model_dump(), indent=2, ensure_ascii=False)
+                )
             else:
                 print(event.output)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
