@@ -128,8 +128,8 @@ Requirements:
 }
 
 PRESET_CANDIDATES = {
-    "Jean-Pierre - Full Stack": """Jean-Pierre Tremblay
-Ottawa, ON | jp.tremblay@email.com
+    "Shopify - Bilingual Developer": """Jean-Pierre Tremblay
+Ottawa, ON | jp.tremblay@email.com | (613) 555-0199
 
 Summary:
 Full-Stack Developer with 4 years of experience building web applications. Highly proficient in React, JavaScript, and Node.js. Intermediate communication skills in French, seeking to transition into a bilingual technical role.
@@ -143,7 +143,7 @@ Education & Skills:
 - B.Sc. in Computer Science | Carleton University, Ottawa
 - Languages: English (Fluent), French (Intermediate/B2)
 - Tech: React, Node.js, Express, PostgreSQL, Git, Agile""",
-    "Sarah - DevOps Expert": """Sarah Jenkins
+    "Coveo - Senior DevOps Engineer": """Sarah Jenkins
 Montreal, QC | sarah.jenkins@email.com
 
 Summary:
