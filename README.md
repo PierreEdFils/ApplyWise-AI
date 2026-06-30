@@ -1,85 +1,80 @@
 # ApplyWise AI 🇨🇦
-### Bilingual Career Agent for Canadian Tech Jobs
+### Bilingual Career Agent for Canadian Tech Job Seekers
 
-ApplyWise AI is a premium, interactive web application designed to help bilingual (English/French) tech job seekers in Canada optimize their applications, analyze skill matches, tailor resumes, generate cover letters, practice elevator pitches, and run mock interviews.
+ApplyWise AI is a Python-based **multi-agent system** designed to help bilingual tech job seekers in Canada turn any job description and candidate profile into a complete, tailored application package. 
 
----
-
-## 📸 Application Showcases
-
-### 1. The Dashboard & Profile Ingestion
-Select from high-fidelity Canadian tech templates (Shopify, Coveo, RBC) or paste a custom Job Description and Resume.
-![Dashboard](images/dashboard.png)
-
-### 2. Match Analytics & Gap Analysis
-Get an overall match score, breakdown of technical, language, and experience competencies, and custom recommendations via the **Skill Gap Academy**.
-![Match Analytics](images/match_analytics.png)
-
-### 3. Bilingual Resume Tailor
-View side-by-side comparisons of original and tailored resume bullets. Hover to see highlighted technical keywords (Teal) and bilingual transition verbs (Purple).
-![Resume Tailor](images/resume_tailor.png)
-
-### 4. Bilingual Cover Letter Builder
-Generate standard English, standard French, or our unique **Bilingual Hybrid** cover letter that showcases dual-language writing capabilities in a single document.
-![Cover Letter](images/cover_letter.png)
-
-### 5. Bilingual Interview Simulator
-Practice technical and behavioral questions in a chatbot interface. The AI recruiter switches questions between English and French, providing inline coaching feedback.
-![Interview Prep](images/interview_prep.png)
-
-### 6. Canadian Tech Hubs: Salary & Cost of Living
-Enter your target base salary and instantly compare net income (after provincial and federal tax calculations), average rents, and monthly expenses in Toronto, Vancouver, Montreal, Ottawa, and Waterloo.
-![Salary & Cost of Living](images/salary_calculator.png)
-
-### 7. Bilingual Tech Glossary
-A searchable database of technology terms and job titles, detailing when to translate terms (per Quebec OQLF guidelines) or leave them in English.
-![Tech Glossary](images/glossary.png)
-
-### 8. Dynamic Application Checklist
-A dedicated todo manager that updates progress in real-time as tasks are completed.
-![Checklist](images/checklist.png)
+It is built using **Google's Agent Development Kit (ADK)** for agent orchestration, a **local Model Context Protocol (MCP) server** for deterministic utility tools, and **Streamlit** for a premium, interactive dashboard.
 
 ---
 
-## 🛠️ Tech Stack
+## 🌟 Key Features (12 Required Outputs)
 
-- **Frontend**: HTML5, Vanilla JavaScript (ES6+)
-- **Styling**: Vanilla CSS (CSS Grid, Flexbox, custom animations, glassmorphism, responsive design, dark/light themes)
-- **API (Optional)**: Gemini API integration for live, real-time AI generation.
+1. **Job Summary**: Synthesized overview of the target role.
+2. **Key Required Skills**: Highlighted tech stack and language needs.
+3. **Match Score**: Calculated overlap score (0-100) using local MCP tools.
+4. **Strong Matching Experience**: Candidate strengths matching the job description.
+5. **Missing Skills or Gaps**: Gaps in the candidate's profile.
+6. **Tailored Resume Headline**: ATS-optimized headline.
+7. **Professional Resume Summary**: Hook for Canadian recruiters.
+8. **Resume Bullet Points**: Achievement-oriented bullets formatted using the Google formula.
+9. **Cover Letter Draft**: Custom-tailored cover letter in English or French.
+10. **Interview Questions**: Likely behavioral and technical questions with STAR outlines.
+11. **Bilingual Elevator Pitches**: 30-second pitches in both English and French.
+12. **Final Application Checklist**: Action items based on job requirements.
 
 ---
 
-## 🚀 CI/CD Workflow & Live Deployment
+## 🏗️ Multi-Agent Architecture
 
-This repository includes a GitHub Actions workflow under `.github/workflows/deploy.yml` that automatically deploys the application to **GitHub Pages** on every push to the `main` branch.
+ApplyWise AI utilizes a pipeline of specialized agents coordinated by a **Root Orchestrator**:
 
-### How to Access the Live Site:
-Once pushed, GitHub will host the site at:
-`https://<your-github-username>.github.io/ApplyWise-AI/`
+- **Root Orchestrator (`SequentialAgent`)**: Controls the workflow and aggregates outputs in the session state.
+- **Job Analyzer Agent (`LlmAgent`)**: Extracts job metadata and required skills.
+- **Candidate Fit Agent (`LlmAgent`)**: Evaluates candidate fit, strengths, and gaps.
+- **Resume Tailor Agent (`LlmAgent`)**: Tailors resume headline, summary, and bullet points.
+- **Interview Coach Agent (`LlmAgent`)**: Generates interview questions, STAR outlines, and bilingual pitches.
+
+All agents have access to a **local MCP server** (`mcp_server.py`) which exposes utility tools:
+- `validate_inputs`: Validates character lengths and presence of inputs.
+- `extract_keywords`: Scans text against a dictionary of common tech terms.
+- `calculate_match_score`: Calculates the overlap percentage.
+- `detect_missing_skills`: Identifies required skills missing from the resume.
+- `format_resume_bullet`: Formats achievements using the Google formula.
+- `generate_checklist`: Creates a checklist based on job requirements.
 
 ---
 
-## 💻 Running Locally
+## 🚀 Getting Started
 
-### Prerequisites
+### 📦 Installation
 
-- [Node.js](https://nodejs.org/) (for running the local development server)
-
-### Steps
-
-1. Start the local server:
+1. Create a virtual environment and install the dependencies:
    ```bash
-   npm run dev
+   pip install -r requirements.txt
    ```
-   *Or directly using npx:*
+
+2. Copy the `.env.example` file to `.env` and configure your API key (optional if using Demo Mode):
    ```bash
-   npx http-server -p 3000
+   cp .env.example .env
    ```
-2. Open your browser and navigate to `http://localhost:3000`.
 
-### Using Live Gemini AI (Optional)
+### 💻 Running the App
 
-1. Click on **Gemini Settings** in the bottom-left corner of the sidebar.
-2. Enter your Gemini API Key (you can get one for free from [Google AI Studio](https://aistudio.google.com/)).
-3. Select your preferred model (e.g., `gemini-2.5-flash`).
-4. Click **Save & Connect**. The status indicator in the top-right will turn green (`Gemini Live`).
+Run the Streamlit application:
+```bash
+streamlit run app.py
+```
+
+Open your browser and navigate to `http://localhost:8501`.
+
+---
+
+## 🎪 5-Minute Capstone Demo Mode
+
+To support a seamless 5-minute presentation or Kaggle capstone demo without waiting for LLM API latency:
+
+1. Enable **Demo / Simulation Mode** in the Streamlit sidebar (enabled by default).
+2. Select a preset template from the dropdown (e.g., **Shopify - Bilingual Developer**).
+3. Click **Analyze & Generate Application Package**.
+4. The dashboard will instantly populate all 12 outputs across organized, visual tabs.
+5. To test live AI generation, toggle **Demo Mode** off, enter your **Gemini API Key** in the sidebar, and click analyze.

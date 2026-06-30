@@ -1,0 +1,21 @@
+Jean-Pierre Tremblay
+Ottawa, ON | jp.tremblay@email.com | (613) 555-0199
+
+Summary:
+Full-Stack Developer with 4 years of experience building web applications. Highly proficient in React, JavaScript, and Node.js. Intermediate communication skills in French, seeking to transition into a bilingual technical role.
+
+Experience:
+Web Developer | TechNorth Solutions, Toronto (Remote) | 2022 - Present
+- Built and maintained client-facing dashboards using React and Redux, improving load times by 20%.
+- Developed backend microservices using Node.js, Express, and MongoDB.
+- Participated in Agile sprint planning and daily standups.
+
+Junior Developer | DevStudio, Montreal, QC | 2020 - 2022
+- Developed UI components using HTML, CSS, and Vue.js.
+- Assisted in writing database migrations and API endpoints in Python/Django.
+- Wrote unit tests in Jest, increasing coverage by 15%.
+
+Education & Skills:
+- B.Sc. in Computer Science | Carleton University, Ottawa
+- Languages: English (Fluent), French (Intermediate/B2)
+- Tech: React, Node.js, Express, Vue.js, PostgreSQL, MongoDB, Git, Agile

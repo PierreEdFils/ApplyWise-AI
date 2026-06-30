@@ -1,0 +1,14 @@
+About the Role:
+Shopify is looking for a Bilingual Full-Stack Developer to join our core merchant experience team. You will work on building scalable web applications that power millions of merchants globally. This role is based out of our Ottawa headquarters with flexible hybrid and remote options.
+
+Key Responsibilities:
+- Design and develop highly interactive web frontends using React, TypeScript, and modern state management.
+- Build robust, scalable backend APIs using Ruby on Rails and PostgreSQL.
+- Collaborate with product managers, designers, and other engineering teams.
+- Support our bilingual merchant base (English and French). While technical documentation is in English, the ability to communicate with merchants and write user-facing content in both French and English is a strong asset.
+
+Requirements:
+- 3+ years of experience in full-stack web development.
+- Strong proficiency in React/JavaScript and Ruby on Rails or a similar backend framework.
+- Experience with RESTful APIs, GraphQL, and relational databases.
+- Strong communication skills in English and French (bilingual proficiency).
