@@ -1,0 +1,19 @@
+{
+  "name": "applywise-ai",
+  "version": "1.0.0",
+  "description": "ApplyWise AI - Bilingual Career Agent for Canadian Tech Jobs",
+  "scripts": {
+    "dev": "npx http-server -p 3000"
+  },
+  "keywords": [
+    "bilingual",
+    "canada",
+    "tech",
+    "careers",
+    "resume-builder",
+    "interview-prep",
+    "salary-estimator"
+  ],
+  "author": "ApplyWise Team",
+  "license": "MIT"
+}
